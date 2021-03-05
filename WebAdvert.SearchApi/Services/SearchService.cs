@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Elasticsearch.Net;
 using Nest;
 using WebAdvert.SearchApi.Models;
 
@@ -22,5 +23,13 @@ namespace WebAdvert.SearchApi.Services
 
             return searchResponse.Hits.Select(hit => hit.Source).ToList();
         }
+
+        public async Task<bool> CheckHealthAsync()
+        {
+            var clusterHealth = await _client.Cluster.HealthAsync();
+
+            return clusterHealth.Status != Health.Red;
+        }
+
     }
 }

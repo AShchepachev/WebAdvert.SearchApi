@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using WebAdvert.SearchApi.Extensions;
 using WebAdvert.SearchApi.Services;
+using WebAdvert.SearchApi.HealthChecks;
 
 namespace WebAdvert.SearchApi
 {
@@ -24,6 +25,7 @@ namespace WebAdvert.SearchApi
             services.AddElasticSearch(Configuration);
             services.AddTransient<ISearchService, SearchService>();
             services.AddControllers();
+            services.AddHealthChecks().AddCheck<SearchHealthCheck>("SearchService", timeout: TimeSpan.FromMinutes(1));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -36,6 +38,8 @@ namespace WebAdvert.SearchApi
             loggerFactory.AddAWSProvider(
                 Configuration.GetAWSLoggingConfigSection(),
                 (loglevel, message, exception) => $"[{DateTime.Now} {loglevel} {message} {exception?.Message} {exception?.StackTrace}]");
+
+            app.UseHealthChecks("/search/health");
 
             app.UseRouting();
             app.UseEndpoints(endpoints =>
