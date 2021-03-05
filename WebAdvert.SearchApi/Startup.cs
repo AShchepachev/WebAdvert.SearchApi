@@ -33,6 +33,9 @@ namespace WebAdvert.SearchApi
             {
                 app.UseDeveloperExceptionPage();
             }
+            loggerFactory.AddAWSProvider(
+                Configuration.GetAWSLoggingConfigSection(),
+                (loglevel, message, exception) => $"[{DateTime.Now} {loglevel} {message} {exception?.Message} {exception?.StackTrace}]");
 
             app.UseRouting();
             app.UseEndpoints(endpoints =>
@@ -40,9 +43,6 @@ namespace WebAdvert.SearchApi
                 endpoints.MapControllers();
             });
 
-            loggerFactory.AddAWSProvider(
-                Configuration.GetAWSLoggingConfigSection(),
-                (loglevel, message, exception) => $"[{DateTime.Now} {loglevel} {message} {exception?.Message} {exception?.StackTrace}]");
         }
     }
 }
